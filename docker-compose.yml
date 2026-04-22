@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  attendance-api:
+    build: .
+    container_name: ai-attendance-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./known_faces:/app/known_faces
+      - ./attendance.json:/app/attendance.json
+    environment:
+      - MONGODB_URL=mongodb://mongo-db:27017/attendance
+    depends_on:
+      - mongo-db
+    restart: unless-stopped
+
+  mongo-db:
+    image: mongo:latest
+    container_name: attendance-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  mongo-data:
