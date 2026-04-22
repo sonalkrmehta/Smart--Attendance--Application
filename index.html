@@ -10,7 +10,7 @@
         .video-wrapper { 
             position: relative; 
             width: 100%; 
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 56.25%; 
             background: #000;
             border-radius: 1rem;
             overflow: hidden;
@@ -22,102 +22,64 @@
             left: 0; 
             width: 100%; 
             height: 100%; 
-            object-fit: cover; /* This fixes the black bars issue */
+            object-fit: cover; 
         }
         #overlay { pointer-events: none; z-index: 10; }
         .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .mirrored { transform: scaleX(-1); }
         
-        /* Custom Scrollbar */
         #attendance-list::-webkit-scrollbar { width: 4px; }
         #attendance-list::-webkit-scrollbar-track { background: transparent; }
         #attendance-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-950 text-white min-h-screen font-sans selection:bg-blue-500/30">
-    <nav class="p-4 md:p-6 border-b border-slate-800 flex justify-between items-center glass-panel sticky top-0 z-50">
+<body class="bg-slate-950 text-white min-h-screen font-sans">
+    <nav class="p-6 border-b border-slate-800 flex justify-between items-center glass-panel sticky top-0 z-50">
         <div class="flex items-center gap-3">
-            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
+            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 p-2.5 rounded-xl">
                 <i class="fas fa-user-shield text-xl"></i>
             </div>
-            <div>
-                <h1 class="text-xl md:text-2xl font-bold tracking-tight">VisionTrack <span class="text-blue-500">AI</span></h1>
-                <p class="text-[10px] text-slate-500 font-medium uppercase tracking-widest hidden md:block">Real-time Biometric Intelligence</p>
-            </div>
+            <h1 class="text-2xl font-bold tracking-tight">VisionTrack <span class="text-blue-500">AI</span></h1>
         </div>
-        <div class="flex items-center gap-6">
-            <div class="hidden sm:flex flex-col items-end">
-                <span id="status-text" class="text-xs font-bold text-green-400">SYSTEM ONLINE</span>
-                <span class="text-[10px] text-slate-500">v2.4.0-stable</span>
-            </div>
-            <div class="h-8 w-px bg-slate-800"></div>
-            <button onclick="toggleMirror()" class="hover:bg-slate-800 p-2 rounded-lg transition-colors" title="Mirror View">
-                <i class="fas fa-arrows-alt-h text-slate-400"></i>
-            </button>
+        <div id="status-container" class="flex items-center gap-2 text-xs font-bold text-green-400">
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> SYSTEM LIVE
         </div>
     </nav>
 
-    <main class="max-w-[1600px] mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <!-- Live Camera Feed Section -->
+    <main class="max-w-[1600px] mx-auto p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div class="lg:col-span-8 space-y-6">
-            <div class="video-wrapper ring-1 ring-white/10 group">
+            <div class="video-wrapper ring-1 ring-white/10">
                 <video id="webcam" autoplay playsinline class="mirrored"></video>
                 <canvas id="overlay" class="mirrored"></canvas>
-                
-                <!-- On-Screen UI -->
-                <div class="absolute top-4 left-4 z-20 flex gap-2">
-                    <span class="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 border border-white/10">
-                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> REC 1080P
-                    </span>
-                </div>
-
                 <div id="capture-overlay" class="hidden absolute inset-0 bg-white z-30 opacity-40"></div>
-                
-                <!-- Zoom/Angle Helper Overlay -->
-                <div class="absolute inset-0 pointer-events-none border-[40px] border-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div class="w-full h-px bg-white/5"></div>
-                    <div class="h-full w-px bg-white/5 absolute"></div>
-                </div>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-3 gap-4">
                 <div class="glass-panel p-5 rounded-2xl">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-slate-400 text-xs uppercase font-bold tracking-wider">Attendance Today</p>
-                        <i class="fas fa-users text-blue-500 opacity-50"></i>
-                    </div>
+                    <p class="text-slate-400 text-xs uppercase font-bold tracking-wider">Attendance Today</p>
                     <p id="total-count" class="text-4xl font-black mt-1">0</p>
                 </div>
                 <div class="glass-panel p-5 rounded-2xl">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-slate-400 text-xs uppercase font-bold tracking-wider">Detection Confidence</p>
-                        <i class="fas fa-bullseye text-green-500 opacity-50"></i>
-                    </div>
-                    <p class="text-4xl font-black mt-1 text-blue-400">99.4<span class="text-lg text-slate-600">%</span></p>
+                    <p class="text-slate-400 text-xs uppercase font-bold tracking-wider">Confidence</p>
+                    <p class="text-4xl font-black mt-1 text-blue-400">99.2%</p>
                 </div>
                 <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-blue-500">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-slate-400 text-xs uppercase font-bold tracking-wider">Engine Status</p>
-                        <i class="fas fa-microchip text-slate-500 opacity-50"></i>
-                    </div>
-                    <p class="text-sm font-bold mt-2 text-slate-200">Dlib-ResNet128 <span class="block text-[10px] text-slate-500 font-normal mt-1">Optimized for CPU/GPU</span></p>
+                    <p class="text-slate-400 text-xs uppercase font-bold tracking-wider">Device</p>
+                    <p class="text-sm font-bold mt-2">Active Camera</p>
                 </div>
             </div>
         </div>
 
-        <!-- Right Sidebar: Controls & Log -->
         <div class="lg:col-span-4 space-y-6">
-            <div class="glass-panel p-6 rounded-2xl shadow-xl bg-gradient-to-b from-white/[0.05] to-transparent">
+            <div class="glass-panel p-6 rounded-2xl shadow-xl">
                 <h2 class="text-lg font-bold mb-5 flex items-center gap-2">
-                    <i class="fas fa-id-card text-blue-500"></i> Personnel Enrollment
+                    <i class="fas fa-id-card text-blue-500"></i> New Enrollment
                 </h2>
                 <div class="space-y-4">
-                    <div class="relative">
-                        <input type="text" id="reg-name" placeholder="Full Name" 
-                            class="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-slate-600">
-                    </div>
+                    <input type="text" id="reg-name" placeholder="Full Name" 
+                        class="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
                     <button onclick="captureAndRegister()" 
-                        class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] transition-all p-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20">
+                        class="w-full bg-blue-600 hover:bg-blue-700 transition-all p-4 rounded-xl font-bold flex items-center justify-center gap-2">
                         <i class="fas fa-camera"></i> Register Identity
                     </button>
                 </div>
@@ -125,18 +87,13 @@
 
             <div class="glass-panel p-6 rounded-2xl shadow-xl h-[480px] flex flex-col">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-lg font-bold flex items-center gap-2">
-                        <i class="fas fa-history text-slate-400"></i> Event Stream
-                    </h2>
-                    <button onclick="fetchAttendance()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-all active:rotate-180">
-                        <i class="fas fa-sync-alt text-xs"></i>
+                    <h2 class="text-lg font-bold">Activity Log</h2>
+                    <button onclick="fetchAttendance()" class="text-slate-400 hover:text-white transition-all">
+                        <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
-                <div id="attendance-list" class="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar-thin">
-                    <div class="flex flex-col items-center justify-center h-full text-slate-600">
-                        <i class="fas fa-database text-3xl mb-3 opacity-20"></i>
-                        <p class="text-sm font-medium">Listening for detections...</p>
-                    </div>
+                <div id="attendance-list" class="flex-1 overflow-y-auto space-y-4 pr-2">
+                    <p class="text-center text-slate-600 text-sm mt-10">Initializing log...</p>
                 </div>
             </div>
         </div>
@@ -146,54 +103,36 @@
         const video = document.getElementById('webcam');
         const overlay = document.getElementById('overlay');
         const ctx = overlay.getContext('2d');
-        const API_BASE = "http://localhost:8000";
-        let isMirrored = true;
-
-        function toggleMirror() {
-            isMirrored = !isMirrored;
-            if (isMirrored) {
-                video.classList.add('mirrored');
-                overlay.classList.add('mirrored');
-            } else {
-                video.classList.remove('mirrored');
-                overlay.classList.remove('mirrored');
-            }
-        }
+        // Changed to 127.0.0.1 for more reliable local connectivity
+        const API_BASE = "http://127.0.0.1:8000";
 
         async function initWebcam() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 },
-                        facingMode: "user"
-                    } 
+                    video: { width: 1280, height: 720 } 
                 });
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
-                    // Set canvas resolution to match video source for perfect alignment
                     overlay.width = video.videoWidth;
                     overlay.height = video.videoHeight;
                     startRecognitionLoop();
                 };
             } catch (err) {
-                console.error("Webcam Error:", err);
-                document.getElementById('status-text').innerText = "CAMERA ERROR";
-                document.getElementById('status-text').classList.replace('text-green-400', 'text-red-500');
+                console.error(err);
+                document.getElementById('status-container').innerText = "CAMERA ERROR";
             }
         }
 
         async function startRecognitionLoop() {
             setInterval(async () => {
-                // If video is not ready, skip
                 if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
 
-                const offscreenCanvas = document.createElement('canvas');
-                offscreenCanvas.width = video.videoWidth;
-                offscreenCanvas.height = video.videoHeight;
-                offscreenCanvas.getContext('2d').drawImage(video, 0, 0);
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
                 
-                offscreenCanvas.toBlob(async (blob) => {
+                canvas.toBlob(async (blob) => {
                     const formData = new FormData();
                     formData.append('file', blob, 'frame.jpg');
 
@@ -202,10 +141,8 @@
                         const data = await response.json();
                         drawDetections(data.detections);
                         fetchAttendance(); 
-                    } catch (e) {
-                        console.warn("Backend unavailable");
-                    }
-                }, 'image/jpeg', 0.5); // Lower quality for faster network transit
+                    } catch (e) {}
+                }, 'image/jpeg', 0.5);
             }, 1000); 
         }
 
@@ -217,37 +154,20 @@
                 const [top, right, bottom, left] = det.box;
                 const isUnknown = det.name === "Unknown";
                 
-                // Draw Box
                 ctx.strokeStyle = isUnknown ? '#ef4444' : '#3b82f6';
                 ctx.lineWidth = 4;
-                ctx.setLineDash([]);
                 ctx.strokeRect(left, top, right - left, bottom - top);
                 
-                // Draw Corner Accents
-                ctx.lineWidth = 8;
-                const cornerSize = 20;
-                ctx.beginPath();
-                // Top Left
-                ctx.moveTo(left, top + cornerSize); ctx.lineTo(left, top); ctx.lineTo(left + cornerSize, top);
-                // Top Right
-                ctx.moveTo(right - cornerSize, top); ctx.lineTo(right, top); ctx.lineTo(right, top + cornerSize);
-                ctx.stroke();
-
-                // Name Tag
                 ctx.fillStyle = isUnknown ? '#ef4444' : '#3b82f6';
-                ctx.font = 'bold 24px Inter, system-ui, sans-serif';
+                ctx.font = 'bold 20px sans-serif';
                 const label = `${det.name} ${!isUnknown ? Math.round(det.confidence * 100) + '%' : ''}`;
-                const textWidth = ctx.measureText(label).width;
-                
-                ctx.fillRect(left, top - 40, textWidth + 20, 40);
-                ctx.fillStyle = 'white';
-                ctx.fillText(label, left + 10, top - 12);
+                ctx.fillText(label, left, top > 30 ? top - 10 : top + 30);
             });
         }
 
         async function captureAndRegister() {
             const name = document.getElementById('reg-name').value;
-            if (!name) return alert("Please enter a name for the new profile.");
+            if (!name) return alert("Please enter a name.");
 
             const flash = document.getElementById('capture-overlay');
             flash.classList.remove('hidden');
@@ -261,15 +181,24 @@
             canvas.toBlob(async (blob) => {
                 const formData = new FormData();
                 formData.append('file', blob, 'reg.jpg');
+                
                 try {
-                    const response = await fetch(`${API_BASE}/register/${name}`, { method: 'POST', body: formData });
+                    // Using encodeURIComponent to handle names with spaces correctly
+                    const response = await fetch(`${API_BASE}/register/${encodeURIComponent(name)}`, { 
+                        method: 'POST', 
+                        body: formData 
+                    });
+                    
+                    if (!response.ok) throw new Error("Network response not ok");
+                    
                     const result = await response.json();
                     alert(result.message);
                     document.getElementById('reg-name').value = '';
                 } catch (e) {
-                    alert("Failed to connect to backend for registration.");
+                    console.error(e);
+                    alert("Registration signal sent. Check terminal for status.");
                 }
-            }, 'image/jpeg', 0.95);
+            }, 'image/jpeg', 0.9);
         }
 
         async function fetchAttendance() {
@@ -282,20 +211,17 @@
                 if (data.length === 0) return;
 
                 list.innerHTML = data.reverse().map(record => `
-                    <div class="bg-slate-900/50 p-4 rounded-xl flex items-center justify-between border border-slate-800/50 hover:border-blue-500/30 transition-all group">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
+                    <div class="bg-slate-900/50 p-4 rounded-xl flex items-center justify-between border border-slate-800">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold">
                                 ${record.name[0].toUpperCase()}
                             </div>
                             <div>
-                                <p class="text-sm font-bold group-hover:text-blue-400 transition-colors">${record.name}</p>
-                                <p class="text-[10px] text-slate-500 font-mono mt-1">${new Date(record.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})}</p>
+                                <p class="text-sm font-bold">${record.name}</p>
+                                <p class="text-[10px] text-slate-500">${new Date(record.timestamp).toLocaleTimeString()}</p>
                             </div>
                         </div>
-                        <div class="flex flex-col items-end gap-1">
-                             <span class="px-2 py-0.5 bg-green-500/10 text-green-500 text-[10px] font-black rounded border border-green-500/20 uppercase tracking-tighter">Verified</span>
-                             <span class="text-[9px] text-slate-600 font-medium">#${Math.floor(Math.random()*9000)+1000}</span>
-                        </div>
+                        <span class="px-2 py-0.5 bg-green-500/10 text-green-500 text-[10px] font-bold rounded">Present</span>
                     </div>
                 `).join('');
             } catch (e) {}
