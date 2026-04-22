@@ -64,7 +64,7 @@ def process_frame(frame):
             "confidence": float(1 - face_distances[best_match_index]) if len(face_distances) > 0 else 0.0
         })
     return results
-
+# log attendance if recognized and not already logged for today samjhe 
 def log_attendance(name: str):
 
     if name == "Unknown":
