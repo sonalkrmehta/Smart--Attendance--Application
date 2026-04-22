@@ -66,7 +66,7 @@ def process_frame(frame):
     return results
 
 def log_attendance(name: str):
-    """Logs attendance to a JSON file (Mock Database)."""
+
     if name == "Unknown":
         return
         
@@ -75,11 +75,11 @@ def log_attendance(name: str):
         with open(ATTENDANCE_FILE, "r") as f:
             records = json.load(f)
     
-    # Check if already marked today
+    
     today = datetime.now().strftime("%Y-%m-%d")
     for r in records:
         if r['name'] == name and r['timestamp'].startswith(today):
-            return # Already marked
+            return 
 
     new_record = {
         "name": name,
@@ -90,21 +90,21 @@ def log_attendance(name: str):
     with open(ATTENDANCE_FILE, "w") as f:
         json.dump(records, f)
 
-# --- API Endpoints ---
+
 @app.post("/register/{name}")
 async def register_face(name: str, file: UploadFile = File(...)):
-    """Registers a new user by saving their face image."""
+    
     file_path = os.path.join(KNOWN_FACES_DIR, f"{name}.jpg")
     with open(file_path, "wb") as buffer:
         buffer.write(await file.read())
     
-    # Update encodings
+    
     load_registered_faces()
     return {"message": f"User {name} registered successfully."}
 
 @app.get("/attendance")
 async def get_attendance():
-    """Returns the attendance log."""
+    
     if not os.path.exists(ATTENDANCE_FILE):
         return []
     with open(ATTENDANCE_FILE, "r") as f:
@@ -112,7 +112,7 @@ async def get_attendance():
 
 @app.post("/recognize")
 async def recognize_api(file: UploadFile = File(...)):
-    """API for single-image recognition (CCTV snapshot)."""
+    
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
