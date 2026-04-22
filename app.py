@@ -11,18 +11,15 @@ from typing import List, Optional
 import uvicorn
 import json
 
-# --- Configuration & State ---
 app = FastAPI(title="Smart AI Attendance System")
 KNOWN_FACES_DIR = "known_faces"
 ATTENDANCE_FILE = "attendance.json"
 os.makedirs(KNOWN_FACES_DIR, exist_ok=True)
 
-# In-memory cache for registered faces
 known_face_encodings = []
 known_face_names = []
 
 def load_registered_faces():
-    """Loads encodings from the known_faces directory."""
     global known_face_encodings, known_face_names
     known_face_encodings = []
     known_face_names = []
@@ -36,18 +33,16 @@ def load_registered_faces():
                 known_face_names.append(os.path.splitext(filename)[0])
     print(f"Loaded {len(known_face_names)} registered faces.")
 
-# Initial load
 load_registered_faces()
 
-# --- Models ---
 class AttendanceRecord(BaseModel):
     name: str
     timestamp: str
     status: str
 
-# --- AI Core Logic ---
+
 def process_frame(frame):
-    """Detects and recognizes faces in a single frame."""
+
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     face_locations = face_recognition.face_locations(rgb_frame)
     face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
