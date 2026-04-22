@@ -85,4 +85,4 @@ This project is licensed under the MIT License.
 
 VisionTrack AI — The future of secure, automated attendance.
 
-# Author by Sonal Kumar
+# Sonal Kumar
