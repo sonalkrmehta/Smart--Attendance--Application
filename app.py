@@ -9,10 +9,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
 
-# --- Configuration & State ---
+ 
 app = FastAPI(title="Smart AI Attendance System")
 
-# CRITICAL: Add CORS Middleware to allow the browser to talk to the backend
+ 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  
@@ -27,12 +27,12 @@ ATTENDANCE_FILE = "attendance.json"
 if not os.path.exists(KNOWN_FACES_DIR):
     os.makedirs(KNOWN_FACES_DIR)
 
-# In-memory cache for registered faces
+ 
 known_face_encodings = []
 known_face_names = []
 
 def load_registered_faces():
-    """Loads encodings from the known_faces directory. Optimized for speed."""
+    
     global known_face_encodings, known_face_names
     new_encodings = []
     new_names = []
@@ -41,7 +41,7 @@ def load_registered_faces():
         if filename.lower().endswith((".jpg", ".png", ".jpeg")):
             path = os.path.join(KNOWN_FACES_DIR, filename)
             try:
-                # We reload images to ensure the cache is always fresh
+                 
                 image = face_recognition.load_image_file(path)
                 encodings = face_recognition.face_encodings(image)
                 if encodings:
@@ -54,10 +54,10 @@ def load_registered_faces():
     known_face_names = new_names
     print(f"--- Model Sync Complete: {len(known_face_names)} faces active ---")
 
-# Initial load
+ 
 load_registered_faces()
 
-# --- AI Logic ---
+ 
 def log_attendance(name: str):
     if name == "Unknown":
         return
@@ -70,7 +70,7 @@ def log_attendance(name: str):
         except:
             records = []
     
-    # Check for existing log in the current hour to avoid spamming
+    
     current_hour = datetime.now().strftime("%Y-%m-%d %H")
     already_logged = any(
         r['name'] == name and r['timestamp'].startswith(current_hour) 
@@ -87,15 +87,12 @@ def log_attendance(name: str):
         with open(ATTENDANCE_FILE, "w") as f:
             json.dump(records, f)
 
-# --- API Endpoints ---
+ 
 @app.post("/register/{name}")
 async def register_face(name: str, background_tasks: BackgroundTasks, file: UploadFile = File(...)):
-    """
-    Registers a face. Uses BackgroundTasks to prevent browser timeouts 
-    during heavy AI encoding processing.
-    """
+    
     try:
-        # Clean name for file system
+        
         safe_name = "".join([c for c in name if c.isalnum() or c in (' ', '_')]).strip()
         if not safe_name:
             raise HTTPException(status_code=400, detail="Invalid name")
@@ -106,7 +103,7 @@ async def register_face(name: str, background_tasks: BackgroundTasks, file: Uplo
         with open(file_path, "wb") as buffer:
             buffer.write(contents)
         
-        # We trigger the reload in the background so we can respond to the browser immediately
+         
         background_tasks.add_task(load_registered_faces)
         
         return {"status": "success", "message": f"Identity '{safe_name}' captured. System is processing in background."}
@@ -143,7 +140,7 @@ async def recognize_api(file: UploadFile = File(...)):
         confidence = 0.0
         
         if known_face_encodings:
-            # tolerance=0.5 makes recognition stricter/more accurate
+             
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.5)
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
             
@@ -165,5 +162,5 @@ async def recognize_api(file: UploadFile = File(...)):
     return {"detections": detections}
 
 if __name__ == "__main__":
-    # Use 127.0.0.1 for more reliable local connections on Windows
+   
     uvicorn.run(app, host="127.0.0.1", port=8000)
