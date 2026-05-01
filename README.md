@@ -1,4 +1,4 @@
-------> VisionTrack AI: Smart Attendance System <------
+--------> VisionTrack AI: Smart Attendance System <--------
 
 VisionTrack AI is a state-of-the-art biometric attendance solution. It leverages Deep Learning to detect and recognize faces in real-time, automating the check-in process for modern workplaces and educational institutions.
 
